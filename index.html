@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Mollifier Functions Library</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+            font-size: 0.9em;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #667eea;
+        }
+        select {
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        input[type="checkbox"] {
+            transform: scale(1.2);
+            accent-color: #667eea;
+        }
+        .plot-container {
+            margin: 20px 0;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .info {
+            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+        .properties {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .property {
+            background: linear-gradient(135deg, #e8f5e8, #f0f8ff);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .property-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .property-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        .function-description {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #ff9800;
+        }
+        .test-function-description {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #4caf50;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        .function-card {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .toggle-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .toggle-section label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enhanced Mollifier Functions Library</h1>
+        
+        <div class="info">
+            <strong>🔬 Explore Mollifiers and Function Smoothing</strong><br>
+            Compare various smooth cutoff functions and see how they smooth out discontinuous functions through convolution. 
+            Perfect for understanding regularization in PDEs, signal processing, and approximation theory.
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="mollifierType">Mollifier Type:</label>
+                <select id="mollifierType">
+                    <option value="standard">Standard Exponential</option>
+                    <option value="gaussian">Gaussian Approximation</option>
+                    <option value="polynomial">Polynomial (Degree 4)</option>
+                    <option value="polynomial6">Polynomial (Degree 6)</option>
+                    <option value="cosine">Cosine-based</option>
+                    <option value="rational">Rational Function</option>
+                    <option value="bump">Bump Function</option>
+                    <option value="quartic">Quartic Spline</option>
+                    <option value="witch">Witch of Agnesi</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="testFunction">Test Function to Mollify:</label>
+                <select id="testFunction">
+                    <option value="step">Step Function</option>
+                    <option value="square">Square Wave</option>
+                    <option value="sawtooth">Sawtooth Wave</option>
+                    <option value="triangle">Triangle Wave</option>
+                    <option value="sign">Sign Function</option>
+                    <option value="abs">Absolute Value</option>
+                    <option value="dirac">Dirac Delta Approximation</option>
+                    <option value="heaviside">Double Step</option>
+                    <option value="discontinuous">Piecewise Function</option>
+                    <option value="jump">Jump Discontinuities</option>
+                    <option value="spike">Spike Train</option>
+                    <option value="indicator">Indicator Function</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="epsilon">Scale (ε): <span id="epsilon-value">1.0</span></label>
+                <input type="range" id="epsilon" min="0.1" max="3" step="0.1" value="1">
+            </div>
+            <div class="control-group">
+                <label for="center">Center: <span id="center-value">0.0</span></label>
+                <input type="range" id="center" min="-3" max="3" step="0.1" value="0">
+            </div>
+            <div class="control-group">
+                <label for="amplitude">Amplitude: <span id="amplitude-value">1.0</span></label>
+                <input type="range" id="amplitude" min="0.1" max="3" step="0.1" value="1">
+            </div>
+            <div class="control-group">
+                <label for="frequency">Frequency (for waves): <span id="frequency-value">1.0</span></label>
+                <input type="range" id="frequency" min="0.1" max="3" step="0.1" value="1">
+            </div>
+        </div>
+
+        <div class="toggle-section">
+            <label><input type="checkbox" id="showOriginal" checked> Show Original Function</label>
+            <label><input type="checkbox" id="showMollifier"> Show Mollifier</label>
+            <label><input type="checkbox" id="showDerivative"> Show 1st Derivative</label>
+            <label><input type="checkbox" id="showSecondDerivative"> Show 2nd Derivative</label>
+            <label><input type="checkbox" id="showConvolution" checked> Show Mollified Function</label>
+            <label><input type="checkbox" id="compareAll"> Compare All Mollifiers</label>
+        </div>
+
+        <div class="function-description" id="function-description">
+            Select a mollifier type to see its mathematical description and properties.
+        </div>
+
+        <div class="test-function-description" id="test-function-description">
+            Select a test function to see its mathematical description and properties.
+        </div>
+
+        <div class="plot-container">
+            <div id="plot"></div>
+        </div>
+
+        <div class="properties">
+            <div class="property">
+                <div class="property-label">Support Width</div>
+                <div class="property-value" id="support-width">2.0</div>
+            </div>
+            <div class="property">
+                <div class="property-label">Maximum Value</div>
+                <div class="property-value" id="max-value">0.0</div>
+            </div>
+            <div class="property">
+                <div class="property-label">Integral</div>
+                <div class="property-value" id="integral">1.0</div>
+            </div>
+            <div class="property">
+                <div class="property-label">Smoothness Class</div>
+                <div class="property-value" id="smoothness">C∞</div>
+            </div>
+            <div class="property">
+                <div class="property-label">Decay Rate</div>
+                <div class="property-value" id="decay-rate">Exponential</div>
+            </div>
+            <div class="property">
+                <div class="property-label">Test Function Type</div>
+                <div class="property-value" id="test-type">Step</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const mollifierTypes = {
+            standard: {
+                name: "Standard Exponential Mollifier",
+                formula: "φ(x) = C·exp(-1/(1-x²)) for |x| < 1, 0 otherwise",
+                description: "The classical mollifier with exponential decay. Infinitely differentiable with compact support.",
+                smoothness: "C∞",
+                decay: "Super-exponential",
+                func: (x, eps, center, amp) => {
+                    const t = (x - center) / eps;
+                    if (Math.abs(t) >= 1) return 0;
+                    const exp_part = Math.exp(-1 / (1 - t * t));
+                    const C = amp / (eps * 0.4439938);
+                    return C * exp_part;
+                }
+            },
+            gaussian: {
+                name: "Gaussian Approximation",
+                formula: "φ(x) = C·exp(-x²/σ²) for |x| < a, 0 otherwise",
+                description: "Truncated Gaussian with compact support. Good approximation properties.",
+                smoothness: "C∞",
+                decay: "Exponential",
+                func: (x, eps, center, amp) => {
+                    const t = (x - center) / eps;
+                    if (Math.abs(t) >= 1) return 0;
+                    const sigma = 0.3;
+                    const exp_part = Math.exp(-t * t / (sigma * sigma));
+                    const C = amp / (eps * sigma * Math.sqrt(2 * Math.PI) * 0.9973);
+                    return C * exp_part;
+                }
+            },
+            polynomial: {
+                name: "Polynomial Mollifier (Degree 4)",
+                formula: "φ(x) = C·(1-x²)² for |x| < 1, 0 otherwise",
+                description: "Simple polynomial with finite differentiability. Easy to compute and integrate.",
+                smoothness: "C¹",
+                decay: "Algebraic",
+                func: (x, eps, center, amp) => {
+                    const t = (x - center) / eps;
+                    if (Math.abs(t) >= 1) return 0;
+                    const poly = Math.pow(1 - t * t, 2);
+                    const C = amp * 15 / (16 * eps);
+                    return C * poly;
+                }
+            },
+            polynomial6: {
+                name: "Polynomial Mollifier (Degree 6)",
+                formula: "φ(x) = C·(1-x²)³ for |x| < 1, 0 otherwise",
+                description: "Higher degree polynomial with better smoothness properties.",
+                smoothness: "C²",
+                decay: "Algebraic",
+                func: (x, eps, center, amp) => {
+                    const t = (x - center) / eps;
+                    if (Math.abs(t) >= 1) return 0;
+                    const poly = Math.pow(1 - t * t, 3);
+                    const C = amp * 35 / (32 * eps);
+                    return C * poly;
+                }
+            },
+            cosine: {
+                name: "Cosine-based Mollifier",
+                formula: "φ(x) = C·cos²(πx/2) for |x| < 1, 0 otherwise",
+                description: "Trigonometric mollifier with smooth transitions. Good for Fourier analysis.",
+                smoothness: "C∞",
+                decay: "Oscillatory",
+                func: (x, eps, center, amp) => {
+                    const t = (x - center) / eps;
+                    if (Math.abs(t) >= 1) return 0;
+                    const cos_part = Math.pow(Math.cos(Math.PI * t / 2), 2);
+                    const C = amp * Math.PI / (4 * eps);
+                    return C * cos_part;
+                }
+            },
+            rational: {
+                name: "Rational Function Mollifier",
+                formula: "φ(x) = C·(1-x²)/(1+x²) for |x| < 1, 0 otherwise",
+                description: "Rational function with good numerical properties. Avoids exponential computation.",
+                smoothness: "C∞",
+                decay: "Rational",
+                func: (x, eps, center, amp) => {
+                    const t = (x - center) / eps;
+                    if (Math.abs(t) >= 1) return 0;
+                    const rational = (1 - t * t) / (1 + t * t);
+                    const C = amp * 2 / (eps * Math.PI);
+                    return C * rational;
+                }
+            },
+            bump: {
+                name: "Bump Function",
+                formula: "φ(x) = C·exp(-1/(1-x²))·exp(-1/x²) for |x| < 1, 0 otherwise",
+                description: "Double exponential bump with very flat top. Ultra-smooth transitions.",
+                smoothness: "C∞",
+                decay: "Double exponential",
+                func: (x, eps, center, amp) => {
+                    const t = (x - center) / eps;
+                    if (Math.abs(t) >= 1 || t === 0) return 0;
+                    const exp1 = Math.exp(-1 / (1 - t * t));
+                    const exp2 = Math.exp(-1 / (t * t));
+                    const C = amp / (eps * 0.2);
+                    return C * exp1 * exp2;
+                }
+            },
+            quartic: {
+                name: "Quartic Spline Mollifier",
+                formula: "φ(x) = C·(1-x²)²·(1+2x²) for |x| < 1, 0 otherwise",
+                description: "Quartic polynomial with C² continuity. Common in spline interpolation.",
+                smoothness: "C²",
+                decay: "Polynomial",
+                func: (x, eps, center, amp) => {
+                    const t = (x - center) / eps;
+                    if (Math.abs(t) >= 1) return 0;
+                    const poly = Math.pow(1 - t * t, 2) * (1 + 2 * t * t);
+                    const C = amp * 105 / (64 * eps);
+                    return C * poly;
+                }
+            },
+            witch: {
+                name: "Witch of Agnesi Mollifier",
+                formula: "φ(x) = C·8a³/(x²+4a²)² for |x| < 1, 0 otherwise",
+                description: "Based on the famous Witch of Agnesi curve. Good for probability applications.",
+                smoothness: "C∞",
+                decay: "Polynomial",
+                func: (x, eps, center, amp) => {
+                    const t = (x - center) / eps;
+                    if (Math.abs(t) >= 1) return 0;
+                    const a = 0.3;
+                    const witch = 8 * Math.pow(a, 3) / Math.pow(t * t + 4 * a * a, 2);
+                    const C = amp / (eps * 0.5);
+                    return C * witch;
+                }
+            }
+        };
+
+        const testFunctions = {
+            step: {
+                name: "Step Function",
+                formula: "f(x) = H(x) = 1 if x > 0, 0 if x ≤ 0",
+                description: "Classic Heaviside step function. Shows how mollifiers smooth jump discontinuities.",
+                type: "Discontinuous",
+                func: (x) => x > 0 ? 1 : 0
+            },
+            square: {
+                name: "Square Wave",
+                formula: "f(x) = sign(sin(2πfx))",
+                description: "Periodic square wave with sharp transitions. Demonstrates mollification of periodic discontinuities.",
+                type: "Periodic",
+                func: (x, freq = 1) => Math.sign(Math.sin(2 * Math.PI * freq * x))
+            },
+            sawtooth: {
+                name: "Sawtooth Wave",
+                formula: "f(x) = 2(fx - floor(fx + 0.5))",
+                description: "Sawtooth wave with jump discontinuities. Shows smoothing of periodic jumps.",
+                type: "Periodic",
+                func: (x, freq = 1) => 2 * (freq * x - Math.floor(freq * x + 0.5))
+            },
+            triangle: {
+                name: "Triangle Wave", 
+                formula: "f(x) = 2|2(fx - floor(fx + 0.5))| - 1",
+                description: "Triangle wave with corner discontinuities in derivative. Shows smoothing of non-differentiable points.",
+                type: "Periodic",
+                func: (x, freq = 1) => {
+                    const t = freq * x - Math.floor(freq * x + 0.5);
+                    return 2 * Math.abs(2 * t) - 1;
+                }
+            },
+            sign: {
+                name: "Sign Function",
+                formula: "f(x) = sign(x) = 1 if x > 0, -1 if x < 0, 0 if x = 0",
+                description: "Signum function with jump discontinuity at origin. Classic example for mollification.",
+                type: "Discontinuous",
+                func: (x) => Math.sign(x)
+            },
+            abs: {
+                name: "Absolute Value",
+                formula: "f(x) = |x|",
+                description: "Absolute value function. Non-differentiable at x = 0, shows smoothing of corners.",
+                type: "Non-differentiable",
+                func: (x) => Math.abs(x)
+            },
+            dirac: {
+                name: "Dirac Delta Approximation",
+                formula: "f(x) ≈ δ(x) = n if |x| < 1/(2n), 0 otherwise",
+                description: "Approximation to Dirac delta function. Shows how mollification creates smooth approximations.",
+                type: "Singular",
+                func: (x) => {
+                    const n = 10;
+                    return Math.abs(x) < 1/(2*n) ? n : 0;
+                }
+            },
+            heaviside: {
+                name: "Double Step",
+                formula: "f(x) = H(x+1) - H(x-1)",
+                description: "Difference of two step functions creating a rectangular pulse. Shows smoothing of multiple discontinuities.",
+                type: "Piecewise",
+                func: (x) => (x > -1 ? 1 : 0) - (x > 1 ? 1 : 0)
+            },
+            discontinuous: {
+                name: "Piecewise Function",
+                formula: "f(x) = x² if x < 0, sin(πx) if 0 ≤ x < 1, e^(-x) if x ≥ 1",
+                description: "Complex piecewise function with multiple discontinuities. Shows smoothing of composite functions.",
+                type: "Piecewise",
+                func: (x) => {
+                    if (x < 0) return x * x;
+                    if (x < 1) return Math.sin(Math.PI * x);
+                    return Math.exp(-x);
+                }
+            },
+            jump: {
+                name: "Jump Discontinuities",
+                formula: "f(x) = floor(2x) + 0.5·sign(sin(3πx))",
+                description: "Function with multiple jump discontinuities. Demonstrates mollification of complex discontinuous behavior.",
+                type: "Multi-discontinuous",
+                func: (x) => Math.floor(2 * x) + 0.5 * Math.sign(Math.sin(3 * Math.PI * x))
+            },
+            spike: {
+                name: "Spike Train",
+                formula: "f(x) = Σ δ(x - n) for integer n",
+                description: "Train of narrow spikes at integer points. Shows how mollifiers create smooth approximations of impulses.",
+                type: "Singular",
+                func: (x) => {
+                    let sum = 0;
+                    for (let n = -3; n <= 3; n++) {
+                        if (Math.abs(x - n) < 0.05) sum += 20;
+                    }
+                    return sum;
+                }
+            },
+            indicator: {
+                name: "Indicator Function",
+                formula: "f(x) = 1 if x ∈ [-1,1], 0 otherwise",
+                description: "Characteristic function of an interval. Shows mollification creating smooth transitions at boundaries.",
+                type: "Characteristic",
+                func: (x) => (Math.abs(x) <= 1) ? 1 : 0
+            }
+        };
+
+        function numericalDerivative(func, x, h = 0.001) {
+            return (func(x + h) - func(x - h)) / (2 * h);
+        }
+
+        function numericalSecondDerivative(func, x, h = 0.001) {
+            return (func(x + h) - 2 * func(x) + func(x - h)) / (h * h);
+        }
+
+        function mollifierConvolution(x, mollifierFunc, testFunc, eps, center, freq) {
+            let sum = 0;
+            const dx = 0.02;
+            const range = 4;
+            for (let t = -range; t <= range; t += dx) {
+                sum += mollifierFunc(x - t, eps, center, 1) * testFunc(t, freq) * dx;
+            }
+            return sum;
+        }
+
+        function updateFunctionDescription() {
+            const mollifierType = document.getElementById('mollifierType').value;
+            const testType = document.getElementById('testFunction').value;
+            
+            const mollifierInfo = mollifierTypes[mollifierType];
+            const testInfo = testFunctions[testType];
+            
+            document.getElementById('function-description').innerHTML = `
+                <strong>${mollifierInfo.name}</strong><br>
+                <em>Formula:</em> ${mollifierInfo.formula}<br>
+                <em>Description:</em> ${mollifierInfo.description}
+            `;
+            
+            document.getElementById('test-function-description').innerHTML = `
+                <strong>${testInfo.name}</strong><br>
+                <em>Formula:</em> ${testInfo.formula}<br>
+                <em>Description:</em> ${testInfo.description}
+            `;
+            
+            document.getElementById('smoothness').textContent = mollifierInfo.smoothness;
+            document.getElementById('decay-rate').textContent = mollifierInfo.decay;
+            document.getElementById('test-type').textContent = testInfo.type;
+        }
+
+        function updatePlot() {
+            const mollifierType = document.getElementById('mollifierType').value;
+            const testType = document.getElementById('testFunction').value;
+            const epsilon = parseFloat(document.getElementById('epsilon').value);
+            const center = parseFloat(document.getElementById('center').value);
+            const amplitude = parseFloat(document.getElementById('amplitude').value);
+            const frequency = parseFloat(document.getElementById('frequency').value);
+            
+            const showOriginal = document.getElementById('showOriginal').checked;
+            const showMollifier = document.getElementById('showMollifier').checked;
+            const showDerivative = document.getElementById('showDerivative').checked;
+            const showSecondDerivative = document.getElementById('showSecondDerivative').checked;
+            const showConvolution = document.getElementById('showConvolution').checked;
+            const compareAll = document.getElementById('compareAll').checked;
+
+            // Update display values
+            document.getElementById('epsilon-value').textContent = epsilon.toFixed(1);
+            document.getElementById('center-value').textContent = center.toFixed(1);
+            document.getElementById('amplitude-value').textContent = amplitude.toFixed(1);
+            document.getElementById('frequency-value').textContent = frequency.toFixed(1);
+            document.getElementById('support-width').textContent = (2 * epsilon).toFixed(1);
+
+            // Generate data
+            const x = [];
+            const dx = 0.01;
+            for (let i = -5; i <= 5; i += dx) {
+                x.push(i);
+            }
+
+            const traces = [];
+            const mollifierFunc = mollifierTypes[mollifierType].func;
+            const testFunc = testFunctions[testType].func;
+
+            if (compareAll) {
+                // Show comparison of all mollifiers on the test function
+                const colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22'];
+                let colorIndex = 0;
+                
+                // Show original function
+                if (showOriginal) {
+                    const y_original = x.map(xi => testFunc(xi, frequency));
+                    traces.push({
+                        x: x,
+                        y: y_original,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'Original ' + testFunctions[testType].name,
+                        line: { color: '#000000', width: 3, dash: 'dot' }
+                    });
+                }
+                
+                Object.entries(mollifierTypes).forEach(([key, info]) => {
+                    const y_convolution = x.map(xi => 
+                        mollifierConvolution(xi, info.func, testFunc, epsilon, center, frequency)
+                    );
+                    traces.push({
+                        x: x,
+                        y: y_convolution,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: info.name.split(' ')[0] + ' Mollified',
+                        line: { color: colors[colorIndex % colors.length], width: 2 }
+                    });
+                    colorIndex++;
+                });
+            } else {
+                // Show selected mollifier and test function
+                if (showOriginal) {
+                    const y_original = x.map(xi => testFunc(xi, frequency));
+                    traces.push({
+                        x: x,
+                        y: y_original,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: testFunctions[testType].name + ' (Original)',
+                        line: { color: '#d62728', width: 3, dash: 'dot' }
+                    });
+                }
+
+                if (showMollifier) {
+                    const y_mollifier = x.map(xi => mollifierFunc(xi, epsilon, center, amplitude));
+                    traces.push({
+                        x: x,
+                        y: y_mollifier,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: mollifierTypes[mollifierType].name,
+                        line: { color: '#1f77b4', width: 2, dash: 'dash' }
+                    });
+
+                    // Update max value
+                    const maxVal = Math.max(...y_mollifier);
+                    document.getElementById('max-value').textContent = maxVal.toFixed(3);
+
+                    // Update integral approximation
+                    let integral = 0;
+                    for (let i = 0; i < x.length - 1; i++) {
+                        integral += y_mollifier[i] * dx;
+                    }
+                    document.getElementById('integral').textContent = integral.toFixed(3);
+                }
+
+                if (showConvolution) {
+                    const y_convolution = x.map(xi => 
+                        mollifierConvolution(xi, mollifierFunc, testFunc, epsilon, center, frequency)
+                    );
+                    traces.push({
+                        x: x,
+                        y: y_convolution,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'Mollified ' + testFunctions[testType].name,
+                        line: { color: '#2ca02c', width: 3 }
+                    });
+                }
+
+                if (showDerivative && showConvolution) {
+                    const y_derivative = x.map(xi => 
+                        numericalDerivative(xj => 
+                            mollifierConvolution(xj, mollifierFunc, testFunc, epsilon, center, frequency), xi)
+                    );
+                    traces.push({
+                        x: x,
+                        y: y_derivative,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: "First Derivative",
+                        line: { color: '#ff7f0e', width: 2, dash: 'dash' }
+                    });
+                }
+
+                if (showSecondDerivative && showConvolution) {
+                    const y_second_derivative = x.map(xi => 
+                        numericalSecondDerivative(xj => 
+                            mollifierConvolution(xj, mollifierFunc, testFunc, epsilon, center, frequency), xi)
+                    );
+                    traces.push({
+                        x: x,
+                        y: y_second_derivative,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: "Second Derivative",
+                        line: { color: '#9467bd', width: 2, dash: 'dot' }
+                    });
+                }
+            }
+
+            const layout = {
+                title: compareAll ? 
+                    `Comparison: All Mollifiers on ${testFunctions[testType].name}` : 
+                    `${mollifierTypes[mollifierType].name} on ${testFunctions[testType].name}`,
+                xaxis: { 
+                    title: 'x',
+                    range: [-4, 4],
+                    zeroline: true,
+                    zerolinewidth: 1,
+                    zerolinecolor: '#888'
+                },
+                yaxis: { 
+                    title: 'f(x)',
+                    zeroline: true,
+                    zerolinewidth: 1,
+                    zerolinecolor: '#888'
+                },
+                showlegend: true,
+                legend: { x: 0.02, y: 0.98 },
+                margin: { l: 70, r: 20, t: 80, b: 60 },
+                hovermode: 'x unified',
+                plot_bgcolor: '#fafafa'
+            };
+
+            Plotly.newPlot('plot', traces, layout, {responsive: true});
+        }
+
+        // Event listeners
+        document.getElementById('mollifierType').addEventListener('change', () => {
+            updateFunctionDescription();
+            updatePlot();
+        });
+        document.getElementById('testFunction').addEventListener('change', () => {
+            updateFunctionDescription();
+            updatePlot();
+        });
+        document.getElementById('epsilon').addEventListener('input', updatePlot);
+        document.getElementById('center').addEventListener('input', updatePlot);
+        document.getElementById('amplitude').addEventListener('input', updatePlot);
+        document.getElementById('frequency').addEventListener('input', updatePlot);
+        document.getElementById('showOriginal').addEventListener('change', updatePlot);
+        document.getElementById('showMollifier').addEventListener('change', updatePlot);
+        document.getElementById('showDerivative').addEventListener('change', updatePlot);
+        document.getElementById('showSecondDerivative').addEventListener('change', updatePlot);
+        document.getElementById('showConvolution').addEventListener('change', updatePlot);
+        document.getElementById('compareAll').addEventListener('change', updatePlot);
+
+        // Initial setup
+        updateFunctionDescription();
+        updatePlot();
+    </script>
+</body>
+</html>
