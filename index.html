@@ -642,7 +642,18 @@
                     });
 
                     
+             // Update max value
+                    const maxVal = Math.max(...y_mollifier);
+                    document.getElementById('max-value').textContent = maxVal.toFixed(3);
+                    
 
+                    // Update integral approximation
+                    let integral = 0;
+                    for (let i = 0; i < x.length - 1; i++) {
+                        integral += y_mollifier[i] * dx;
+                    }
+                    document.getElementById('integral').textContent = integral.toFixed(3);
+                }
                     
 
                 if (showConvolution) {
