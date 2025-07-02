@@ -147,8 +147,39 @@
         
         <div class="info">
             <strong>🔬 Explore Mollifiers and Function Smoothing</strong><br>
-            Compare various smooth cutoff functions and see how they smooth out discontinuous functions through convolution. 
-            Perfect for understanding regularization in PDEs, signal processing, and approximation theory.
+            <p>
+                <strong>Mollifiers</strong> are smooth functions with special properties used to create smooth approximations of non-smooth functions. 
+                They are fundamental tools in mathematical analysis, particularly in the theory of partial differential equations and distribution theory.
+            </p>
+            <p>
+                A mollifier is typically a smooth function φ with compact support that satisfies:
+                <ul>
+                    <li>φ ∈ C<sup>∞</sup> (infinitely differentiable)</li>
+                    <li>φ has compact support (identically zero outside some interval)</li>
+                    <li>∫φ(x)dx = 1 (normalized to have unit integral)</li>
+                    <li>φ<sub>ε</sub>(x) = (1/ε)φ(x/ε) (scaled version with parameter ε)</li>
+                </ul>
+            </p>
+            <p>
+                The convolution of a function f with a mollifier φ<sub>ε</sub> produces a smooth approximation of f:
+                <br>
+                f<sub>ε</sub>(x) = (f ∗ φ<sub>ε</sub>)(x) = ∫f(y)φ<sub>ε</sub>(x-y)dy
+                <br>
+                As ε → 0, f<sub>ε</sub> converges to f in various senses depending on the properties of f.
+            </p>
+            <p>
+                Learn more about mollifiers on <a href="https://en.wikipedia.org/wiki/Mollifier" target="_blank">Wikipedia</a>.
+            </p>
+            <p>
+                <strong>Applications:</strong>
+                <ul>
+                    <li>Regularization of non-smooth functions</li>
+                    <li>Proofs of density theorems in function spaces</li>
+                    <li>Construction of smooth partitions of unity</li>
+                    <li>Numerical analysis and signal processing</li>
+                    <li>Regularization of ill-posed problems</li>
+                </ul>
+            </p>
         </div>
 
         <div class="controls">
@@ -226,14 +257,6 @@
             <div class="property">
                 <div class="property-label">Support Width</div>
                 <div class="property-value" id="support-width">2.0</div>
-            </div>
-            <div class="property">
-                <div class="property-label">Maximum Value</div>
-                <div class="property-value" id="max-value">0.0</div>
-            </div>
-            <div class="property">
-                <div class="property-label">Integral</div>
-                <div class="property-value" id="integral">1.0</div>
             </div>
             <div class="property">
                 <div class="property-label">Smoothness Class</div>
@@ -618,17 +641,9 @@
                         line: { color: '#1f77b4', width: 2, dash: 'dash' }
                     });
 
-                    // Update max value
-                    const maxVal = Math.max(...y_mollifier);
-                    document.getElementById('max-value').textContent = maxVal.toFixed(3);
+                    
 
-                    // Update integral approximation
-                    let integral = 0;
-                    for (let i = 0; i < x.length - 1; i++) {
-                        integral += y_mollifier[i] * dx;
-                    }
-                    document.getElementById('integral').textContent = integral.toFixed(3);
-                }
+                    
 
                 if (showConvolution) {
                     const y_convolution = x.map(xi => 
